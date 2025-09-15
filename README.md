@@ -1,5 +1,5 @@
 # Office Add‑ins MCP Server
-[中文版本](.README_zh_tw.md)
+[中文版本](./README_zh_tw.md)
 
 ## Overview
 

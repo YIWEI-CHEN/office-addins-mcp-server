@@ -1,5 +1,5 @@
 # Office Add‑ins MCP Server
-[English Version](.README.md)
+[English Version](./README.md)
 
 ## 簡介
 
