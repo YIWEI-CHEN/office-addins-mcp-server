@@ -3,14 +3,15 @@
 
 ## 簡介
 
-這個儲存庫提供一個基於 **Model Context Protocol (MCP)** 的簡易伺服器，
+用於探索和管理跨 Word、Excel、PowerPoint、Outlook 和 Teams 的 Microsoft Office 外掛程式的 Model Context Protocol (MCP) 伺服器。此伺服器讓 AI 代理能夠搜尋外掛程式並檢索詳細中繼資料、安裝或卸載外掛程式、處理自訂外掛程式的提交、驗證和發布。
+
+這個儲存庫提供一個基於 **Model Context Protocol (MCP)** 的全面伺服器實作，
 使用官方 Python SDK 中的 **FastMCP** 類別快速建構。MCP 是一套標準化
-協議，用來讓大型語言模型（LLM）與外部資源或工具溝通。
+協議，用來讓大型語言模型（LLM）與 Microsoft Office 外掛程式服務溝通。
 FastMCP 將複雜的 MCP 協議封裝在高階介面之中，讓開發者只需利用少數
 修飾器即可把普通的 Python 函式轉換成 MCP 工具或資源。
-此伺服器提供一個工具，可依據 **asset ID** 從 Microsoft Office Add‑ins API
-查詢外掛詳細資訊。藉由這個 MCP 伺服器，具備 MCP 客戶端功能的 LLM
-應用程式（例如 Claude Desktop）便能輕鬆呼叫 API 並取得資料。
+
+目前，此伺服器提供基本的外掛程式詳細資訊檢索功能，並規劃在未來版本中提供全面的外掛程式管理功能（請參閱開發路線圖部分）。
 
 ## Features / 功能
 
@@ -113,6 +114,20 @@ office-addins-mcp-server/
 ├── README.md              # 英文專案說明
 └── README_zh_tw.md        # 專案中文說明
 ```
+
+## 開發路線圖
+
+以下功能已規劃於未來版本開發：
+
+1. **外掛搜尋功能** - 實作完整的 Office 外掛搜尋功能
+2. **搜尋外掛功能提示** - 使用智能提示與篩選增強搜尋體驗
+3. **OAuth2 身份驗證** - 實作 Microsoft Graph API 的安全身份驗證
+4. **顯示已安裝外掛** - 顯示使用者在各 Office 應用程式中已安裝的外掛
+5. **安裝/卸載外掛** - 程式化安裝與移除外掛功能
+6. **提交自訂外掛** - 支援將自訂外掛提交至 Office Store
+7. **驗證自訂外掛** - 自動化驗證與合規性檢查自訂外掛
+8. **發布自訂外掛** - 簡化自訂外掛的發布流程
+9. **M365 管理員推送外掛** - 允許 Microsoft 365 管理員集中部署外掛
 
 ## 後續改進
 

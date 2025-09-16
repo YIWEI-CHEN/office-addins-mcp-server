@@ -3,17 +3,16 @@
 
 ## Overview
 
-This repository provides a simple server implementation based on the
+A Model Context Protocol (MCP) server for discovering and managing Microsoft Office Add‑ins across Word, Excel, PowerPoint, Outlook, and Teams. This server enables AI agents to search add-ins and retrieve detailed metadata, install or uninstall add-ins, handle submission, validation, and publishing of custom add-ins.
+
+This repository provides a comprehensive server implementation based on the
 **Model Context Protocol (MCP)** using the official Python SDK. MCP
 standardizes how large language models (LLMs) communicate with external data
 sources and tools.  The `FastMCP` class encapsulates the complexity of MCP
 and lets developers expose ordinary Python functions as MCP tools or
 resources with minimal boilerplate.
 
-This server exposes a single tool that retrieves the details of a Microsoft
-Office add‑in by its **asset ID**.  An MCP‑enabled client (for example,
-Claude Desktop) can call this tool to fetch metadata from the Office
-Add‑ins API.
+Currently, the server provides basic add-in detail retrieval functionality, with comprehensive add-in management features planned for future releases (see Roadmap section).
 
 ## Features
 
@@ -117,6 +116,20 @@ office-addins-mcp-server/
 └── README_zh_tw.md        # Traditional Chinese description
 ```
 
+## Roadmap
+
+The following features are planned for future development:
+
+1. **Add-in Search** - Implement comprehensive search functionality for Office add-ins
+2. **Add Prompts to Search Add-in Features** - Enhance search with intelligent prompts and filtering
+3. **OAuth2 Authentication** - Secure authentication for Microsoft Graph API access
+4. **Show Installed Add-ins** - Display user's currently installed add-ins across Office applications
+5. **Install/Uninstall Add-ins** - Programmatic installation and removal of add-ins
+6. **Submit Custom Add-ins** - Enable submission of custom add-ins to the Office Store
+7. **Validate Custom Add-ins** - Automated validation and compliance checking for custom add-ins
+8. **Publish Custom Add-ins** - Streamlined publishing workflow for custom add-ins
+9. **M365 Admin Push Add-ins** - Allow Microsoft 365 administrators to centrally deploy add-ins
+
 ## Future Improvements
 
 This project currently implements a single tool.  Potential enhancements
@@ -126,6 +139,6 @@ include:
 * **Improved error handling:** Provide richer error messages and recovery
   guidance.
 * **Additional tools:** Expand the server with other Office API functions,
-  such as searching add‑ins or listing a user’s installed add‑ins.
+  such as searching add‑ins or listing a user's installed add‑ins.
 
 Contributions are welcome—feel free to submit issues or pull requests.
