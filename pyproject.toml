@@ -3,7 +3,7 @@ name = "office-addins-mcp-server"
 version = "0.1.0"
 description = "MCP server for discovering and managing Microsoft Office Add-ins across Word, Excel, PowerPoint, Outlook, and Teams"
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.10"
 license = {file = "LICENSE"}
 authors = [
     { name = "Yi-Wei Chen", email = "feberium@gmail.com" }
@@ -14,6 +14,7 @@ classifiers = [
     "Intended Audience :: Developers",
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Topic :: Software Development :: Libraries :: Python Modules",
@@ -33,6 +34,9 @@ office-addins-mcp-server = "src.server:main"
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src"]
 
 [tool.uv]
 dev-dependencies = []
