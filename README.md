@@ -45,7 +45,7 @@ brew install uv
 powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
 ``` -->
 
-### Project Setup
+<!-- ### Project Setup -->
 
 1. **Clone the repository**:
 
@@ -61,7 +61,7 @@ powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | ie
    # based on pyproject.toml and uv.lock
    uv sync
    ```
-
+<!-- 
 3. **Activate the virtual environment** (optional):
 
    ```bash
@@ -71,7 +71,7 @@ powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | ie
    .venv\Scripts\activate     # Windows
    ```
 
-   Alternatively, you can use `uv run` to execute commands in the virtual environment without activating it.
+   Alternatively, you can use `uv run` to execute commands in the virtual environment without activating it. -->
 
 ### Running the Server
 

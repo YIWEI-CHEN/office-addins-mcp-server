@@ -37,7 +37,7 @@
 # 選項 1：使用 uv run（推薦）
 uv run python src/server.py
 
-# 選項 2：激活虛擬環境後
+# 選項 2：啟動虛擬環境後
 source .venv/bin/activate
 python src/server.py
 
