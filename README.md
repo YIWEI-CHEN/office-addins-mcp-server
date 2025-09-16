@@ -89,7 +89,7 @@ python src/server.py
 uv run office-addins-mcp-server
 ```
 
-## Server Configuration
+<!-- ## Server Configuration
 
 The server supports multiple transport types and can be configured using environment variables:
 
@@ -117,10 +117,6 @@ SSE_PATH=/sse    # Default: SSE endpoint path
 - **`sse`**: Server-Sent Events transport, ideal for web service deployment
 - **`http`**: Streamable HTTP transport, suitable for HTTP-based integrations
 
-### Manual Configuration
-
-Alternatively, you can modify the transport directly in `src/server.py` by editing the call to `run_server(transport="your_transport")` in the `main()` function.
-
 ### Configuration Options
 
 **Available Environment Variables:**
@@ -136,7 +132,7 @@ By default the server:
 - Uses STDIO transport
 - Listens on `0.0.0.0:8000` (for SSE/HTTP transports)
 - Uses root path (`/`) for routing
-- Loads all configuration from `.env` file if present
+- Loads all configuration from `.env` file if present -->
 
 ## Testing the Server
 
