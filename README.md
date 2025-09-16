@@ -78,15 +78,15 @@ powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | ie
 You can run the server in several ways:
 
 ```bash
-# Option 1: Using uv run (recommended)
-uv run python src/server.py
-
-# Option 2: After activating the virtual environment
-source .venv/bin/activate
-python src/server.py
-
-# Option 3: Using the installed script (TBD)
+# Option 1: Using the installed script (recommended)
 uv run office-addins-mcp-server
+
+# Option 2: Using uv run with direct path
+uv run python office_addins_mcp_server/server.py
+
+# Option 3: After activating the virtual environment
+source .venv/bin/activate
+python office_addins_mcp_server/server.py
 ```
 
 <!-- ## Server Configuration
@@ -142,31 +142,18 @@ via `uv run mcp`.  For example:
 
 ```bash
 # Start the server in development mode
-uv run mcp dev src/server.py
+uv run mcp dev office_addins_mcp_server/server.py
 
 # Or install it into Claude Desktop
-uv run mcp install src/server.py
+uv run mcp install office_addins_mcp_server/server.py
+
+# Or use the installed script
+uv run office-addins-mcp-server
 ```
 
 Once running, you can connect using Claude Desktop or the MCP Inspector to
 test the tool.  Refer to the official documentation for writing custom
 clients.
-
-<!-- ## Project Structure
-
-```
-office-addins-mcp-server/
-├── docs/
-│   └── execution_plan.md  # Implementation plan in English
-├── src/
-│   ├── __init__.py       # Marks src as a package
-│   └── server.py         # MCP server implementation
-├── pyproject.toml         # Project configuration and dependencies
-├── uv.lock               # Lock file for reproducible builds
-├── requirements.txt       # Legacy dependencies (for reference)
-├── README.md              # English project description
-└── README_zh_tw.md        # Traditional Chinese description
-``` -->
 
 ## Announcements
 

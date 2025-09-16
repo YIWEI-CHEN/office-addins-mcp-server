@@ -34,15 +34,15 @@
 您可以用幾種方式執行伺服器：
 
 ```bash
-# 選項 1：使用 uv run（推薦）
-uv run python src/server.py
-
-# 選項 2：啟動虛擬環境後
-source .venv/bin/activate
-python src/server.py
-
-# 選項 3：使用已安裝的腳本（待實現）
+# 選項 1：使用已安裝的腳本（推薦）
 uv run office-addins-mcp-server
+
+# 選項 2：使用 uv run 直接路徑
+uv run python office_addins_mcp_server/server.py
+
+# 選項 3：啟動虛擬環境後
+source .venv/bin/activate
+python office_addins_mcp_server/server.py
 ```
 
 <!-- ## 伺服器配置
@@ -96,10 +96,13 @@ SSE_PATH=/sse    # 預設：SSE 端點路徑
 
 ```bash
 # 在開發模式下啟動伺服器
-uv run mcp dev src/server.py
+uv run mcp dev office_addins_mcp_server/server.py
 
 # 或安裝到 Claude Desktop
-uv run mcp install src/server.py
+uv run mcp install office_addins_mcp_server/server.py
+
+# 或使用已安裝的腳本
+uv run office-addins-mcp-server
 ```
 
 運行後，您可以使用 Claude Desktop 或 MCP Inspector 連接來測試工具。請參考官方文檔編寫自定義客戶端。

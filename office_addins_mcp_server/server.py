@@ -22,7 +22,7 @@ from dotenv import load_dotenv
 # mcp.server.fastmcp module.
 from mcp.server.fastmcp import FastMCP
 
-from tools import get_addin_details
+from office_addins_mcp_server.tools import get_addin_details
 
 
 def load_server_config() -> dict:
@@ -129,10 +129,10 @@ def run_server() -> None:
             mcp.run(transport="stdio")
         elif config["transport"] == "sse":
             logger.info(f"🌐 Starting server with SSE transport at {config['host']}:{config['port']}{config['sse_path']}")
-            mcp.run(transport="sse", host=config["host"], port=config["port"], path=config["sse_path"])
+            mcp.run(transport="sse")
         elif config["transport"] == "http":
             logger.info(f"🌐 Starting server with HTTP transport at {config['host']}:{config['port']}{config['path']}")
-            mcp.run(transport="streamable-http", host=config["host"], port=config["port"], path=config["path"])
+            mcp.run(transport="streamable-http")
 
     except KeyboardInterrupt:
         logger.info("\n⏹️  Server shutdown requested by user")
