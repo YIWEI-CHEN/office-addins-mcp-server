@@ -17,6 +17,8 @@ import sys
 from datetime import datetime
 
 from dotenv import load_dotenv
+from starlette.requests import Request
+from starlette.responses import JSONResponse
 
 # Import FastMCP from the official MCP SDK.  FastMCP is located in the
 # mcp.server.fastmcp module.
@@ -78,11 +80,8 @@ logging.basicConfig(
 )
 logger = logging.getLogger("office-addins-mcp")
 
-# Create the MCP server instance
-mcp = FastMCP("Office Add‑ins MCP Server")
 
-
-def register_tools() -> None:
+def register_tools(mcp: FastMCP) -> None:
     """Register all tools with the MCP server.
 
     Parameters
@@ -104,6 +103,32 @@ def register_tools() -> None:
     logger.info("Successfully registered 1 tool: get_addin_details")
 
 
+def register_custom_routes(mcp: FastMCP) -> None:
+    """Register custom HTTP routes with the MCP server.
+    
+    Custom routes are only available when using SSE or HTTP transports.
+    
+    Parameters
+    ----------
+    mcp : FastMCP
+        The FastMCP server instance to register custom routes with.
+    """
+    logger.info("Registering custom routes...")
+    
+    @mcp.custom_route("/health", methods=["GET"])
+    async def health_check(request: Request) -> JSONResponse:
+        """Health check endpoint that returns server status."""
+        logger.debug("Health check requested")
+        return JSONResponse({
+            "status": "healthy",
+            "timestamp": datetime.now().isoformat(),
+            "service": "Office Add-ins MCP Server",
+            "version": "1.0.0"
+        })
+    
+    logger.info("Successfully registered custom route: /health")
+
+
 def run_server() -> None:
     """Run the MCP server with configuration from .env file.
 
@@ -120,8 +145,23 @@ def run_server() -> None:
         config = load_server_config()
         logger.info(f"Server configuration: {config}")
 
+        # Create the MCP server instance with transport-specific configuration
+        if config["transport"] == "http":
+            mcp = FastMCP(
+                "Office Add‑ins MCP Server",
+                host=config["host"],
+                port=config["port"],
+                streamable_http_path=config["path"]
+            )
+        else:
+            mcp = FastMCP("Office Add‑ins MCP Server")
+
         # Register all tools with the server
-        register_tools()
+        register_tools(mcp)
+        
+        # Register custom routes only for HTTP transport
+        if config["transport"] == "http":
+            register_custom_routes(mcp)
 
         # Start the server with the specified transport and configuration
         if config["transport"] == "stdio":

@@ -45,11 +45,11 @@ source .venv/bin/activate
 python office_addins_mcp_server/server.py
 ```
 
-<!-- ## 伺服器配置
+## 伺服器配置
 
 伺服器支援多種傳輸類型，可以使用環境變數進行配置：
 
-### 傳輸配置
+<!-- ### 傳輸配置 -->
 
 在專案根目錄創建 `.env` 文件來配置伺服器：
 
@@ -73,7 +73,7 @@ SSE_PATH=/sse    # 預設：SSE 端點路徑
 - **`sse`**：Server-Sent Events 傳輸，適合 Web 服務部署
 - **`http`**：串流 HTTP 傳輸，適用於基於 HTTP 的整合
 
-### 配置選項
+<!-- ### 配置選項
 
 **可用的環境變數：**
 - `TRANSPORT`：傳輸類型（`stdio`、`sse`、`http`）- 預設：`stdio`

@@ -89,11 +89,11 @@ source .venv/bin/activate
 python office_addins_mcp_server/server.py
 ```
 
-<!-- ## Server Configuration
+## Server Configuration
 
 The server supports multiple transport types and can be configured using environment variables:
 
-### Transport Configuration
+<!-- ### Transport Configuration -->
 
 Create a `.env` file in the project root to configure the server:
 
@@ -117,7 +117,7 @@ SSE_PATH=/sse    # Default: SSE endpoint path
 - **`sse`**: Server-Sent Events transport, ideal for web service deployment
 - **`http`**: Streamable HTTP transport, suitable for HTTP-based integrations
 
-### Configuration Options
+<!-- ### Configuration Options
 
 **Available Environment Variables:**
 - `TRANSPORT`: Transport type (`stdio`, `sse`, `http`) - Default: `stdio`
