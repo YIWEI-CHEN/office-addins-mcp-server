@@ -3,117 +3,106 @@
 
 ## 簡介
 
-用於探索和管理跨 Word、Excel、PowerPoint、Outlook 和 Teams 的 Microsoft Office 外掛程式的 Model Context Protocol (MCP) 伺服器。此伺服器讓 AI 代理能夠搜尋外掛程式並檢索詳細中繼資料、安裝或卸載外掛程式、處理自訂外掛程式的提交、驗證和發布。
+用於探索和管理跨 Word、Excel、PowerPoint、Outlook 和 Teams 的 Microsoft Office 外掛程式的 Model Context Protocol (MCP) 伺服器。
 
-這個儲存庫提供一個基於 **Model Context Protocol (MCP)** 的全面伺服器實作，
-使用官方 Python SDK 中的 **FastMCP** 類別快速建構。MCP 是一套標準化
-協議，用來讓大型語言模型（LLM）與 Microsoft Office 外掛程式服務溝通。
-FastMCP 將複雜的 MCP 協議封裝在高階介面之中，讓開發者只需利用少數
-修飾器即可把普通的 Python 函式轉換成 MCP 工具或資源。
+這個儲存庫提供一個基於 **Model Context Protocol (MCP)** 的伺服器實作，使用官方 Python SDK。MCP 標準化大型語言模型（LLM）與外部資料來源和工具的通訊方式。`FastMCP` 類別封裝了 MCP 的複雜性，讓開發者能夠以最少的樣板程式碼將普通的 Python 函式公開為 MCP 工具或資源。
 
 目前，此伺服器提供基本的外掛程式詳細資訊檢索功能，並規劃在未來版本中提供全面的外掛程式管理功能（請參閱開發路線圖部分）。
 
-## Features / 功能
+## 安裝與設定
 
-- **標準化介面：** MCP 伺服器是一種標準化 API，使 LLM 能透過統一的界面
-  存取內部工具或資料來源。
-- **FastMCP 簡化開發：** FastMCP 採用修飾器與型別註解自動產生工具的
-  schema，減少樣板程式碼，並支援同步與非同步函式。
-- **Server‑Sent Events (SSE)：** 本範例使用 SSE 傳輸方式，可以作為 Web
-  服務部署；若要在本地工具模式使用 STDIO 傳輸，只需修改
-  `mcp.run()` 的 `transport` 參數。
-- **非同步 API 呼叫：** 工具使用 `httpx.AsyncClient` 非同步呼叫
-  Office Add‑ins API，確保 MCP 伺服器在處理網路請求時不會阻塞其他工作。
+此專案使用 [uv](https://docs.astral.sh/uv/) 來管理 Python 依賴項目和虛擬環境，並包含 `pyproject.toml` 配置文件和 `uv.lock` 文件以確保跨不同環境的可重現構建。
 
-## 安裝與使用
+### 專案設定
 
-以下步驟說明如何在本地環境安裝與執行此 MCP 伺服器。請先確保安裝有
-Python 3.8 或以上版本。
+1. **下載專案**：
 
-### 1. 取得原始碼
+   ```bash
+   git clone <repository-url> office-addins-mcp-server
+   cd office-addins-mcp-server
+   ```
 
-```bash
-git clone <repository-url> office-addins-mcp-server
-cd office-addins-mcp-server
-```
+2. **使用 uv 安裝**：
 
-### 2. 使用 uv 管理相依套件
+   ```bash
+   # 這將創建虛擬環境並根據 pyproject.toml 和 uv.lock 安裝所有套件
+   uv sync
+   ```
 
-此專案建議使用 [uv](https://docs.astral.sh/uv/) 來管理 Python 專案。uv
-將專案的依賴和鎖檔集中在 `pyproject.toml` 和 `uv.lock`，無需自行建立
-虛擬環境。安裝 uv 後，執行以下步驟：
+### 執行伺服器
+
+您可以用幾種方式執行伺服器：
 
 ```bash
-# 在專案根目錄初始化 uv 專案
-uv init
-
-# 新增依賴：MCP SDK 與 httpx
-uv add "mcp[cli]"
-uv add httpx
-
-# 安裝所有依賴（當已存在 uv.lock 時）
-uv install
-```
-
-執行 `uv init` 會產生 `pyproject.toml` 和 `uv.lock`。完成後，您可以使用
-`uv run` 來執行 Python 程式，例如：
-
-```bash
+# 選項 1：使用 uv run（推薦）
 uv run python src/server.py
-```
 
-在 `pyproject.toml` 中，這兩個依賴將被列為必需套件：
-
-* `mcp[cli]` – 官方 Model Context Protocol SDK，包括 FastMCP 伺服器類別與
-  CLI 工具。
-* `httpx` – 非同步 HTTP 用戶端，用來呼叫 Office Add‑ins API。
-
-### 3. 執行 MCP 伺服器
-
-進入專案根目錄後，執行下列指令啟動伺服器：
-
-```bash
+# 選項 2：激活虛擬環境後
+source .venv/bin/activate
 python src/server.py
+
+# 選項 3：使用已安裝的腳本（待實現）
+uv run office-addins-mcp-server
 ```
 
-預設狀態下伺服器會以 SSE 傳輸方式在 `0.0.0.0:8000` 上監聽。欲
-修改埠號或使用 STDIO 模式，可在 `src/server.py` 中調整
-`mcp.run()` 的參數。例如：
+## 伺服器配置
 
-```python
-mcp.run(transport="stdio")  # 用於本地 CLI 客戶端
-```
+伺服器支援多種傳輸類型，可以使用環境變數進行配置：
 
-### 4. 測試伺服器
+### 傳輸配置
 
-要驗證伺服器是否正常工作，可以透過支援 MCP 的客戶端連線並呼叫
-`get_addin_details` 工具。官方 SDK 提供多種方法，包括 `uv run mcp` 指令
-或撰寫程式使用 `mcp.client`。以下示意使用命令列工具：
+在專案根目錄創建 `.env` 文件來配置伺服器：
 
 ```bash
-# 安裝 mcp[cli] 之後，使用 uv 執行伺服器
+# .env 文件
+
+# 傳輸配置
+TRANSPORT=stdio  # 預設：標準輸入/輸出
+# TRANSPORT=sse   # Server-Sent Events 用於 Web 部署
+# TRANSPORT=http  # 串流 HTTP 傳輸
+
+# 網路配置（用於 SSE 和 HTTP 傳輸）
+HOST=0.0.0.0     # 預設：監聽所有介面
+PORT=8000        # 預設：Port 8000
+PATH_PREFIX=/    # 預設：根路徑（用於未來的 HTTP 路由）
+SSE_PATH=/sse    # 預設：SSE 端點路徑
+```
+
+**傳輸類型：**
+- **`stdio`**（預設）：標準輸入/輸出傳輸，非常適合本地測試和 CLI 整合
+- **`sse`**：Server-Sent Events 傳輸，適合 Web 服務部署
+- **`http`**：串流 HTTP 傳輸，適用於基於 HTTP 的整合
+
+### 配置選項
+
+**可用的環境變數：**
+- `TRANSPORT`：傳輸類型（`stdio`、`sse`、`http`）- 預設：`stdio`
+- `HOST`：綁定的主機 - 預設：`0.0.0.0`（所有介面）
+- `PORT`：監聽的端口 - 預設：`8000`
+- `PATH_PREFIX`：HTTP 路由的路徑前綴 - 預設：`/`
+- `SSE_PATH`：SSE 端點路徑 - 預設：`/sse`
+
+### 預設設定
+
+預設情況下，伺服器：
+- 使用 STDIO 傳輸
+- 監聽 `0.0.0.0:8000`（用於 SSE/HTTP 傳輸）
+- 使用根路徑（`/`）進行路由
+- 如果存在則從 `.env` 文件載入所有配置
+
+## 測試伺服器
+
+要驗證伺服器是否工作，請使用相容 MCP 的客戶端連接並調用 `get_addin_details` 工具。官方 SDK 通過 `uv run mcp` 提供 CLI 工具。例如：
+
+```bash
+# 在開發模式下啟動伺服器
 uv run mcp dev src/server.py
-# 或安裝到 Claude Desktop 等應用程式
+
+# 或安裝到 Claude Desktop
 uv run mcp install src/server.py
 ```
 
-上述指令會啟動本範例伺服器，並讓支援 MCP 的應用程式（例如
-Claude Desktop 或 MCP Inspector）可以連線測試。使用者亦可參考
-官方文件撰寫客戶端程式來呼叫工具。
-
-## 專案結構
-
-```text
-office-addins-mcp-server/
-├── docs/
-│   └── execution_plan.md  # 英文執行計劃
-├── src/
-│   ├── __init__.py       # 使 src 成為可匯入的模組
-│   └── server.py         # MCP 伺服器實作
-├── requirements.txt       # Python 相依套件清單
-├── README.md              # 英文專案說明
-└── README_zh_tw.md        # 專案中文說明
-```
+運行後，您可以使用 Claude Desktop 或 MCP Inspector 連接來測試工具。請參考官方文檔編寫自定義客戶端。
 
 ## 最新公告
 
