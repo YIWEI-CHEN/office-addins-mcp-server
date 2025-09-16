@@ -1,10 +1,6 @@
 # Office Add‑ins MCP Server
 [English Version](./README.md)
 
-## 最新消息
-
-**2024-09-13** -  MCP 伺服器開始開發，目前已實作 `get_addin_details` 工具。
-
 ## 簡介
 
 用於探索和管理跨 Word、Excel、PowerPoint、Outlook 和 Teams 的 Microsoft Office 外掛程式的 Model Context Protocol (MCP) 伺服器。此伺服器讓 AI 代理能夠搜尋外掛程式並檢索詳細中繼資料、安裝或卸載外掛程式、處理自訂外掛程式的提交、驗證和發布。
@@ -119,6 +115,10 @@ office-addins-mcp-server/
 └── README_zh_tw.md        # 專案中文說明
 ```
 
+## 最新公告
+
+🎉 2025-09-13：Office Add-ins MCP 伺服器建立。
+
 ## 開發路線圖
 
 以下功能已規劃於未來版本開發：
@@ -132,15 +132,5 @@ office-addins-mcp-server/
 7. **驗證自訂外掛** - 自動化驗證與合規性檢查自訂外掛
 8. **發布自訂外掛** - 簡化自訂外掛的發布流程
 9. **M365 管理員推送外掛** - 允許 Microsoft 365 管理員集中部署外掛
-
-## 後續改進
-
-此專案目前僅實作一個簡單工具，可依需求新增更多工具或資源，如：
-
-* **快取機制：** 為頻繁查詢的 add‑in 資訊加入快取，以減少對
-  Office API 的重複呼叫。
-* **錯誤處理強化：** 改進對異常情況的處理與回報機制。
-* **其他工具：** 擴充為不同 Office API 功能（例如搜尋外掛、列出使用者
-  安裝的外掛等）。
 
 歡迎貢獻者提供建議或提交拉取請求，共同完善此 MCP 伺服器。
