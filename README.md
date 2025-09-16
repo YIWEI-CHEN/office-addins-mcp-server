@@ -14,7 +14,7 @@ resources with minimal boilerplate.
 
 Currently, the server provides basic add-in detail retrieval functionality, with comprehensive add-in management features planned for future releases (see Roadmap section).
 
-## Features
+<!-- ## Features
 
 * **Standardized interface:** MCP servers act like APIs for LLMs, allowing
   secure access to internal tools or data.
@@ -24,13 +24,13 @@ Currently, the server provides basic add-in detail retrieval functionality, with
 * **Multiple transports:** Supports STDIO for local testing and CLI integration,
   Server‑Sent Events (SSE) for remote clients, and HTTP for streamable HTTP requests.
 * **Async HTTP:** The tool uses `httpx.AsyncClient` to call the Office
-  Add‑ins API without blocking the event loop.
+  Add‑ins API without blocking the event loop. -->
 
 ## Installation and Setup
 
 This project uses [uv](https://docs.astral.sh/uv/) to manage Python dependencies and virtual environments and includes a `pyproject.toml` configuration file and a `uv.lock` file to ensure reproducible builds across different environments.
 
-### Prerequisites
+<!-- ### Prerequisites
 
 First, install uv if you haven't already:
 
@@ -43,7 +43,7 @@ brew install uv
 
 # Or on Windows with PowerShell
 powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
-```
+``` -->
 
 ### Project Setup
 
@@ -87,29 +87,6 @@ python src/server.py
 
 # Option 3: Using the installed script (TBD)
 uv run office-addins-mcp-server
-```
-
-### Dependencies
-
-The project dependencies are defined in `pyproject.toml` and locked in `uv.lock`:
-
-* `mcp[cli]>=0.1.0` – the official Model Context Protocol SDK and CLI tools
-* `httpx>=0.27.0` – an asynchronous HTTP client for calling the Office API
-* `python-dotenv>=1.0.0` – environment variable management from .env files
-
-### Development
-
-To add new dependencies:
-
-```bash
-# Add a runtime dependency
-uv add package-name
-
-# Add a development dependency
-uv add --dev pytest
-
-# Update dependencies
-uv sync
 ```
 
 ## Server Configuration
@@ -179,7 +156,7 @@ Once running, you can connect using Claude Desktop or the MCP Inspector to
 test the tool.  Refer to the official documentation for writing custom
 clients.
 
-## Project Structure
+<!-- ## Project Structure
 
 ```
 office-addins-mcp-server/
@@ -193,7 +170,7 @@ office-addins-mcp-server/
 ├── requirements.txt       # Legacy dependencies (for reference)
 ├── README.md              # English project description
 └── README_zh_tw.md        # Traditional Chinese description
-```
+``` -->
 
 ## Announcements
 
