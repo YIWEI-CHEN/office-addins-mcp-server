@@ -4,7 +4,7 @@ version = "0.1.0"
 description = "MCP server for discovering and managing Microsoft Office Add-ins across Word, Excel, PowerPoint, Outlook, and Teams"
 readme = "README.md"
 requires-python = ">=3.11"
-license = "MIT"
+license = {file = "LICENSE"}
 authors = [
     { name = "Yi-Wei Chen", email = "feberium@gmail.com" }
 ]
