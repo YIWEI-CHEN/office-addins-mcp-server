@@ -45,14 +45,14 @@ A serverless implementation using Azure Functions with MCP extension support, pe
 | Aspect | Standalone Server | Azure Functions |
 |--------|------------------|------------------|
 | **Name** | `office-addins-mcp-server` | `office-addins-mcp-server-azure` |
-| **Dependencies** | `mcp[cli]`, `python-dotenv` | `azure-functions`, `azure-functions-worker` |
+| **Dependencies** | `mcp[cli]` | `azure-functions`, `azure-functions-worker` |
 | **Keywords** | `mcp`, `server` | `azure-functions`, `serverless` |
 | **Entry Points** | CLI script included | Function app only |
 | **Build Target** | Python package | Azure Functions deployment |
 | **Deployment** | Self-hosted or local | Serverless cloud deployment |
 | **Scaling** | Manual | Automatic |
 | **Cost Model** | Fixed hosting costs | Pay-per-execution |
-| **Configuration** | `.env` file | `host.json` + environment variables |
+| **Configuration** | Command-line arguments | `host.json` + environment variables |
 | **Status** | ✅ Stable | ⚠️ Experimental |
 
 ---
@@ -112,58 +112,23 @@ You can run the server in several ways:
 # Option 1: Using the installed script (recommended)
 uv run office-addins-mcp-server
 
-# Option 2: Using uv run with direct path
-uv run python office_addins_mcp_server/server.py
+# Option 2: With specific transport
+uv run office-addins-mcp-server --transport stdio
+uv run office-addins-mcp-server --transport sse
+uv run office-addins-mcp-server --transport http
 
-# Option 3: After activating the virtual environment
+# Option 3: Using uv run with direct path
+uv run python office_addins_mcp_server/server.py --transport stdio
+
+# Option 4: After activating the virtual environment
 source .venv/bin/activate
-python office_addins_mcp_server/server.py
-```
-
-## Server Configuration
-
-The server supports multiple transport types and can be configured using environment variables:
-
-<!-- ### Transport Configuration -->
-
-Create a `.env` file in the project root to configure the server:
-
-```bash
-# .env file
-
-# Transport configuration
-TRANSPORT=stdio  # Default: Standard input/output
-# TRANSPORT=sse   # Server-Sent Events for web deployment
-# TRANSPORT=http  # Streamable HTTP transport
-
-# Network configuration (for SSE and HTTP transports)
-HOST=0.0.0.0     # Default: Listen on all interfaces
-PORT=8000        # Default: Port 8000
-PATH_PREFIX=/    # Default: Root path (for future HTTP routing)
-SSE_PATH=/sse    # Default: SSE endpoint path
+python office_addins_mcp_server/server.py --transport stdio
 ```
 
 **Transport Types:**
 - **`stdio`** (default): Standard input/output transport, perfect for local testing and CLI integration
 - **`sse`**: Server-Sent Events transport, ideal for web service deployment
 - **`http`**: Streamable HTTP transport, suitable for HTTP-based integrations
-
-<!-- ### Configuration Options
-
-**Available Environment Variables:**
-- `TRANSPORT`: Transport type (`stdio`, `sse`, `http`) - Default: `stdio`
-- `HOST`: Host to bind to - Default: `0.0.0.0` (all interfaces)
-- `PORT`: Port to listen on - Default: `8000`
-- `PATH_PREFIX`: Path prefix for HTTP routing - Default: `/`
-- `SSE_PATH`: SSE endpoint path - Default: `/sse`
-
-### Default Settings
-
-By default the server:
-- Uses STDIO transport
-- Listens on `0.0.0.0:8000` (for SSE/HTTP transports)
-- Uses root path (`/`) for routing
-- Loads all configuration from `.env` file if present -->
 
 ## Testing the Server
 

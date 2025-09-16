@@ -4,70 +4,22 @@ Office Add‑ins across Word, Excel, PowerPoint, Outlook, and Teams.
 
 Features:
 - Multiple transport support: STDIO (default), SSE, and HTTP
-- Environment-based configuration via .env files
 - Async HTTP client for Office Add-ins API calls
 """
 
 from __future__ import annotations
 
 import logging
-import os
-from pathlib import Path
 import sys
 from datetime import datetime
 
-from dotenv import load_dotenv
-from starlette.requests import Request
-from starlette.responses import JSONResponse
+import click
 
 # Import FastMCP from the official MCP SDK.  FastMCP is located in the
 # mcp.server.fastmcp module.
 from mcp.server.fastmcp import FastMCP
 
 from office_addins_mcp_server.tools import get_addin_details
-
-
-def load_server_config() -> dict:
-    """Load server configuration from .env file.
-
-    Uses python-dotenv to load server configuration from a .env file in the project root.
-    Falls back to defaults if variables are not set or the file doesn't exist.
-
-    Returns
-    -------
-    dict
-        Server configuration with keys: transport, host, port, path, sse_path
-    """
-    # Look for .env file in the project root and load it
-    env_file = Path(__file__).parent.parent / ".env"
-    logger.info(f"Loading configuration from: {env_file}")
-    if env_file.exists():
-        load_dotenv(dotenv_path=env_file)
-        logger.info("Configuration loaded from .env file")
-    else:
-        logger.info("No .env file found, using default configuration")
-
-    # Get transport from environment variable, default to "stdio"
-    transport = os.getenv("TRANSPORT", "stdio").lower()
-
-    # Validate transport type
-    if transport not in ["sse", "stdio", "http"]:
-        logger.warning(f"Invalid transport '{transport}' in configuration. Using 'stdio' instead.")
-        transport = "stdio"
-
-    # Get host, port, and path configuration
-    host = os.getenv("HOST", "0.0.0.0")
-    port = int(os.getenv("PORT", "8000"))
-    path = os.getenv("PATH_PREFIX", "/")
-    sse_path = os.getenv("SSE_PATH", "/sse")
-
-    return {
-        "transport": transport,
-        "host": host,
-        "port": port,
-        "path": path,
-        "sse_path": sse_path
-    }
 
 
 # Configure logging
@@ -103,37 +55,38 @@ def register_tools(mcp: FastMCP) -> None:
     logger.info("Successfully registered 1 tool: get_addin_details")
 
 
-# def register_custom_routes(mcp: FastMCP) -> None:
-#     """Register custom HTTP routes with the MCP server.
+def create_mcp_server() -> FastMCP:
+    """Create and configure the MCP server instance.
+
+    Returns
+    -------
+    FastMCP
+        Configured MCP server instance with tools registered
+    """
+    logger.info("Creating MCP server instance...")
+    mcp = FastMCP("Office Add‑ins MCP Server")
     
-#     Custom routes are only available when using SSE or HTTP transports.
+    # Register all tools with the server
+    register_tools(mcp)
     
-#     Parameters
-#     ----------
-#     mcp : FastMCP
-#         The FastMCP server instance to register custom routes with.
-#     """
-#     logger.info("Registering custom routes...")
-    
-#     @mcp.custom_route("/health", methods=["GET"])
-#     async def health_check(request: Request) -> JSONResponse:
-#         """Health check endpoint that returns server status."""
-#         logger.debug("Health check requested")
-#         return JSONResponse({
-#             "status": "healthy",
-#             "timestamp": datetime.now().isoformat(),
-#             "service": "Office Add-ins MCP Server",
-#             "version": "1.0.0"
-#         })
-    
-#     logger.info("Successfully registered custom route: /health")
+    return mcp
 
 
-def run_server() -> None:
-    """Run the MCP server with configuration from .env file.
+def run_server(transport: str | None = None) -> FastMCP:
+    """Run the MCP server with the specified transport.
 
-    Loads server configuration from .env file and starts the FastMCP server.
-    Configuration includes transport type, host, port, and path prefix.
+    Creates and starts the FastMCP server with the given transport type.
+    Defaults to stdio transport if no transport is specified.
+    
+    Parameters
+    ----------
+    transport : str | None
+        Transport type (stdio, sse, or http). Defaults to stdio.
+    
+    Returns
+    -------
+    FastMCP
+        The configured MCP server instance
     """
     try:
         logger.info("=" * 60)
@@ -141,39 +94,23 @@ def run_server() -> None:
         logger.info("=" * 60)
         logger.info(f"Start time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
         
-        # Load server configuration from .env file
-        config = load_server_config()
-        logger.info(f"Server configuration: {config}")
+        # Create the MCP server instance
+        mcp = create_mcp_server()
 
-        # # Create the MCP server instance with transport-specific configuration
-        # if config["transport"] == "http":
-        #     mcp = FastMCP(
-        #         "Office Add‑ins MCP Server",
-        #         host=config["host"],
-        #         port=config["port"],
-        #         streamable_http_path=config["path"]
-        #     )
-        # else:
-        #     mcp = FastMCP("Office Add‑ins MCP Server")
-        mcp = FastMCP("Office Add‑ins MCP Server")
-
-        # Register all tools with the server
-        register_tools(mcp)
+        # Start the server with the specified transport (default to stdio)
+        transport = transport or "stdio"
         
-        # Register custom routes only for HTTP transport
-        # if config["transport"] == "http":
-        #     register_custom_routes(mcp)
-
-        # Start the server with the specified transport and configuration
-        if config["transport"] == "stdio":
+        if transport == "stdio":
             logger.info("🔌 Starting server with STDIO transport for local CLI clients")
             mcp.run(transport="stdio")
-        elif config["transport"] == "sse":
-            logger.info(f"🌐 Starting server with SSE transport at {config['host']}:{config['port']}{config['sse_path']}")
+        elif transport == "sse":
+            logger.info("🌐 Starting server with SSE transport")
             mcp.run(transport="sse")
-        elif config["transport"] == "http":
-            logger.info(f"🌐 Starting server with HTTP transport at {config['host']}:{config['port']}{config['path']}")
+        elif transport == "http":
+            logger.info("🌐 Starting server with HTTP transport")
             mcp.run(transport="streamable-http")
+
+        return mcp
 
     except KeyboardInterrupt:
         logger.info("\n⏹️  Server shutdown requested by user")
@@ -183,14 +120,29 @@ def run_server() -> None:
         sys.exit(1)
 
 
-def main() -> None:
-    """Entry point for running the MCP server.
-
-    When executed as a script, this function loads transport configuration from
-    .env file, registers tools and starts the FastMCP server.
+@click.command()
+@click.option(
+    "--transport", "-t",
+    type=click.Choice(["stdio", "sse", "http"], case_sensitive=False),
+    help="Transport protocol to use (overrides .env file). stdio: for local CLI clients, sse: for web clients, http: for REST API clients"
+)
+def main(transport: str | None = None) -> None:
+    """Office Add-ins MCP Server
+    
+    A Model Context Protocol (MCP) server for discovering and managing Microsoft
+    Office Add‑ins across Word, Excel, PowerPoint, Outlook, and Teams.
+    
+    Examples:
+    
+    \b
+    uv run office-addins-mcp-server --transport stdio
+    uv run office-addins-mcp-server --transport sse  
+    uv run office-addins-mcp-server --transport http
     """
     logger.info("Initializing Office Add-ins MCP Server...")
-    run_server()
+    
+    # Run server with transport argument from click
+    run_server(transport)
 
 
 if __name__ == "__main__":
