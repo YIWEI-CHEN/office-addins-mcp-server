@@ -6,7 +6,7 @@
 A Model Context Protocol (MCP) server for discovering and managing Microsoft Office Add‑ins across Word, Excel, PowerPoint, Outlook, and Teams. This server enables AI agents to search add-ins and retrieve detailed metadata, install or uninstall add-ins, handle submission, validation, and publishing of custom add-ins.
 
 This repository provides a comprehensive server implementation based on the
-**Model Context Protocol (MCP)** using the official Python SDK. MCP
+**Model Context Protocol (MCP)** using the official Python SDK. MCP
 standardizes how large language models (LLMs) communicate with external data
 sources and tools.  The `FastMCP` class encapsulates the complexity of MCP
 and lets developers expose ordinary Python functions as MCP tools or
@@ -21,16 +21,31 @@ Currently, the server provides basic add-in detail retrieval functionality, with
 * **FastMCP convenience:** The SDK generates tool schemas from type hints
   and docstrings, minimizing boilerplate while supporting both synchronous
   and asynchronous functions.
-* **SSE transport:** This example uses Server‑Sent Events for remote clients,
+* **SSE transport:** This example uses Server‑Sent Events for remote clients,
   but you can switch to STDIO for local testing.
 * **Async HTTP:** The tool uses `httpx.AsyncClient` to call the Office
   Add‑ins API without blocking the event loop.
 
 ## Installation and Setup
 
-This project recommends using [uv](https://docs.astral.sh/uv/) to manage
-Python dependencies.  uv handles dependency resolution and virtual
-environments via `pyproject.toml` and `uv.lock`.
+This project uses [uv](https://docs.astral.sh/uv/) to manage Python dependencies and virtual environments and includes a `pyproject.toml` configuration file and a `uv.lock` file to ensure reproducible builds across different environments.
+
+### Prerequisites
+
+First, install uv if you haven't already:
+
+```bash
+# Install uv (cross-platform)
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Or on macOS with Homebrew
+brew install uv
+
+# Or on Windows with PowerShell
+powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+```
+
+### Project Setup
 
 1. **Clone the repository**:
 
@@ -39,46 +54,64 @@ environments via `pyproject.toml` and `uv.lock`.
    cd office-addins-mcp-server
    ```
 
-2. **Initialize the uv project**:
+2. **Install dependencies using uv**:
 
    ```bash
-   # Generate pyproject.toml and uv.lock in the project root
-   uv init
+   # This will create a virtual environment and install all dependencies
+   # based on pyproject.toml and uv.lock
+   uv sync
    ```
 
-3. **Add dependencies**:
+3. **Activate the virtual environment** (optional):
 
    ```bash
-   # Add the MCP SDK and httpx to the project
-   uv add "mcp[cli]"
-   uv add httpx
+   # Activate the virtual environment manually
+   source .venv/bin/activate  # Linux/macOS
+   # or
+   .venv\Scripts\activate     # Windows
    ```
 
-4. **Install dependencies** (if a lock file already exists):
+   Alternatively, you can use `uv run` to execute commands in the virtual environment without activating it.
 
-   ```bash
-   uv install
-   ```
+### Running the Server
 
-After these steps, uv manages all dependencies.  You can run the server
-with:
+You can run the server in several ways:
 
 ```bash
+# Option 1: Using uv run (recommended)
 uv run python src/server.py
+
+# Option 2: After activating the virtual environment
+source .venv/bin/activate
+python src/server.py
+
+# Option 3: Using the installed script (TBD)
+uv run office-addins-mcp-server
 ```
 
-The dependencies used are:
+### Dependencies
 
-* `mcp[cli]` – the official Model Context Protocol SDK and CLI tools.
-* `httpx` – an asynchronous HTTP client for calling the Office API.
+The project dependencies are defined in `pyproject.toml` and locked in `uv.lock`:
 
-## Running the Server
+* `mcp[cli]>=0.1.0` – the official Model Context Protocol SDK and CLI tools
+* `httpx>=0.27.0` – an asynchronous HTTP client for calling the Office API
 
-Start the server by running:
+### Development
+
+To add new dependencies:
 
 ```bash
-python src/server.py
+# Add a runtime dependency
+uv add package-name
+
+# Add a development dependency
+uv add --dev pytest
+
+# Update dependencies
+uv sync
 ```
+
+## Server Configuration
 
 By default the server uses SSE transport and listens on `0.0.0.0:8000`.
 To change the port or use STDIO transport, edit the call to `mcp.run()` in
@@ -98,7 +131,7 @@ uv run mcp dev src/server.py
 uv run mcp install src/server.py
 ```
 
-Once running, you can connect using Claude Desktop or the MCP Inspector to
+Once running, you can connect using Claude Desktop or the MCP Inspector to
 test the tool.  Refer to the official documentation for writing custom
 clients.
 
@@ -111,10 +144,13 @@ office-addins-mcp-server/
 ├── src/
 │   ├── __init__.py       # Marks src as a package
 │   └── server.py         # MCP server implementation
-├── requirements.txt       # Python dependencies
+├── pyproject.toml         # Project configuration and dependencies
+├── uv.lock               # Lock file for reproducible builds
+├── requirements.txt       # Legacy dependencies (for reference)
 ├── README.md              # English project description
 └── README_zh_tw.md        # Traditional Chinese description
 ```
+
 ## Announcements
 
 🎉 2025-09-13: The Office Add-ins MCP server is created.
