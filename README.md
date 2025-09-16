@@ -26,7 +26,38 @@ Currently, the server provides basic add-in detail retrieval functionality, with
 * **Async HTTP:** The tool uses `httpx.AsyncClient` to call the Office
   Add‑ins API without blocking the event loop. -->
 
-## Installation and Setup
+## Deployment Options
+
+This project offers two deployment options:
+
+### 1. 🏠 Standalone MCP Server (Original)
+A traditional MCP server using FastMCP, ideal for local development and direct integration.
+
+### 2. ☁️ Azure Functions MCP Server (Serverless) ⚠️
+A serverless implementation using Azure Functions with MCP extension support, perfect for cloud deployment with automatic scaling.
+
+> **⚠️ Note**: The Azure Functions implementation has not been fully tested and verified yet. Use the standalone server for production workloads until further testing is completed.
+
+**For Azure Functions deployment, see:** [`azure-functions/`](./azure-functions/) directory
+
+### 🔑 **Key Differences Between Implementations**
+
+| Aspect | Standalone Server | Azure Functions |
+|--------|------------------|------------------|
+| **Name** | `office-addins-mcp-server` | `office-addins-mcp-server-azure` |
+| **Dependencies** | `mcp[cli]`, `python-dotenv` | `azure-functions`, `azure-functions-worker` |
+| **Keywords** | `mcp`, `server` | `azure-functions`, `serverless` |
+| **Entry Points** | CLI script included | Function app only |
+| **Build Target** | Python package | Azure Functions deployment |
+| **Deployment** | Self-hosted or local | Serverless cloud deployment |
+| **Scaling** | Manual | Automatic |
+| **Cost Model** | Fixed hosting costs | Pay-per-execution |
+| **Configuration** | `.env` file | `host.json` + environment variables |
+| **Status** | ✅ Stable | ⚠️ Experimental |
+
+---
+
+## Installation and Setup (Standalone Server)
 
 This project uses [uv](https://docs.astral.sh/uv/) to manage Python dependencies and virtual environments and includes a `pyproject.toml` configuration file and a `uv.lock` file to ensure reproducible builds across different environments.
 
@@ -174,3 +205,28 @@ The following features are planned for future development:
 9. **M365 Admin Push Add-ins** - Allow Microsoft 365 administrators to centrally deploy add-ins
 
 Contributions are welcome—feel free to submit issues or pull requests.
+
+<!-- ## Project Structure
+
+```
+office-addins-mcp-server/
+├── office_addins_mcp_server/    # Standalone MCP server implementation
+│   ├── server.py               # Main FastMCP server
+│   └── tools/                  # MCP tools implementation
+│       └── addin_tools.py      # Office add-ins API tools
+├── azure-functions/            # Azure Functions serverless implementation
+│   ├── function_app.py         # Azure Functions app
+│   ├── host.json              # Azure Functions configuration
+│   ├── pyproject.toml         # Azure Functions project config
+│   ├── requirements.txt       # Azure Functions dependencies
+│   ├── deploy.sh              # Automated deployment script
+│   ├── dev.sh                 # Local development script
+│   └── README.md              # Azure Functions documentation
+├── requirements.txt            # Standalone server dependencies
+├── pyproject.toml             # Standalone server project config
+└── README.md                  # This file
+``` -->
+
+**Choose your deployment:**
+- **Local/Standalone**: Use the root directory files
+- **Azure Functions**: Use the `azure-functions/` directory
