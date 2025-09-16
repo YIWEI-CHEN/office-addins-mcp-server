@@ -21,8 +21,8 @@ Currently, the server provides basic add-in detail retrieval functionality, with
 * **FastMCP convenience:** The SDK generates tool schemas from type hints
   and docstrings, minimizing boilerplate while supporting both synchronous
   and asynchronous functions.
-* **SSE transport:** This example uses Server‑Sent Events for remote clients,
-  but you can switch to STDIO for local testing.
+* **Multiple transports:** Supports STDIO for local testing and CLI integration,
+  Server‑Sent Events (SSE) for remote clients, and HTTP for streamable HTTP requests.
 * **Async HTTP:** The tool uses `httpx.AsyncClient` to call the Office
   Add‑ins API without blocking the event loop.
 
@@ -95,6 +95,7 @@ The project dependencies are defined in `pyproject.toml` and locked in `uv.lock`
 
 * `mcp[cli]>=0.1.0` – the official Model Context Protocol SDK and CLI tools
 * `httpx>=0.27.0` – an asynchronous HTTP client for calling the Office API
+* `python-dotenv>=1.0.0` – environment variable management from .env files
 
 ### Development
 
@@ -113,9 +114,52 @@ uv sync
 
 ## Server Configuration
 
-By default the server uses SSE transport and listens on `0.0.0.0:8000`.
-To change the port or use STDIO transport, edit the call to `mcp.run()` in
-`src/server.py`.
+The server supports multiple transport types and can be configured using environment variables:
+
+### Transport Configuration
+
+Create a `.env` file in the project root to configure the server:
+
+```bash
+# .env file
+
+# Transport configuration
+TRANSPORT=stdio  # Default: Standard input/output
+# TRANSPORT=sse   # Server-Sent Events for web deployment
+# TRANSPORT=http  # Streamable HTTP transport
+
+# Network configuration (for SSE and HTTP transports)
+HOST=0.0.0.0     # Default: Listen on all interfaces
+PORT=8000        # Default: Port 8000
+PATH_PREFIX=/    # Default: Root path (for future HTTP routing)
+SSE_PATH=/sse    # Default: SSE endpoint path
+```
+
+**Transport Types:**
+- **`stdio`** (default): Standard input/output transport, perfect for local testing and CLI integration
+- **`sse`**: Server-Sent Events transport, ideal for web service deployment
+- **`http`**: Streamable HTTP transport, suitable for HTTP-based integrations
+
+### Manual Configuration
+
+Alternatively, you can modify the transport directly in `src/server.py` by editing the call to `run_server(transport="your_transport")` in the `main()` function.
+
+### Configuration Options
+
+**Available Environment Variables:**
+- `TRANSPORT`: Transport type (`stdio`, `sse`, `http`) - Default: `stdio`
+- `HOST`: Host to bind to - Default: `0.0.0.0` (all interfaces)
+- `PORT`: Port to listen on - Default: `8000`
+- `PATH_PREFIX`: Path prefix for HTTP routing - Default: `/`
+- `SSE_PATH`: SSE endpoint path - Default: `/sse`
+
+### Default Settings
+
+By default the server:
+- Uses STDIO transport
+- Listens on `0.0.0.0:8000` (for SSE/HTTP transports)
+- Uses root path (`/`) for routing
+- Loads all configuration from `.env` file if present
 
 ## Testing the Server
 

@@ -1,20 +1,20 @@
 """
-Office Add‑ins MCP Server
-=========================
+A Model Context Protocol (MCP) server for discovering and managing Microsoft
+Office Add‑ins across Word, Excel, PowerPoint, Outlook, and Teams.
 
-This module defines a simple Model Context Protocol (MCP) server using the
-FastMCP framework.  The server exposes a single tool that fetches details of a
-Microsoft Office add‑in identified by its asset ID.  MCP clients (for example,
-LLM‑powered applications) can call this tool to retrieve up‑to‑date metadata
-about a given add‑in.  By leveraging FastMCP's decorators and type hints, the
-tool schema is automatically generated and validated for the client.
-
-The server uses SSE (Server‑Sent Events) transport, making it suitable for
-deployment as a web service.  When run directly, it listens on all network
-interfaces on port 8000.
+Features:
+- Multiple transport support: STDIO (default), SSE, and HTTP
+- Environment-based configuration via .env files
+- Async HTTP client for Office Add-ins API calls
 """
 
 from __future__ import annotations
+
+import os
+from pathlib import Path
+import sys
+
+from dotenv import load_dotenv
 
 # Import FastMCP from the official MCP SDK.  FastMCP is located in the
 # mcp.server.fastmcp module.
@@ -23,50 +23,103 @@ from mcp.server.fastmcp import FastMCP
 from .tools import get_addin_details
 
 
-def create_server() -> FastMCP:
-    """Instantiate and configure the MCP server.
+def load_server_config() -> dict:
+    """Load server configuration from .env file.
+
+    Uses python-dotenv to load server configuration from a .env file in the project root.
+    Falls back to defaults if variables are not set or the file doesn't exist.
 
     Returns
     -------
-    fastmcp.FastMCP
-        An instance of a configured FastMCP server ready to register tools.
+    dict
+        Server configuration with keys: transport, host, port, path, sse_path
     """
-    return FastMCP(
-        name="OfficeAddinsMCPServer",
-        instructions=(
-            "This MCP server provides tools to fetch Office add‑ins details from the "
-            "Microsoft Office Add‑ins API. Use the available tools to retrieve "
-            "information about a specific add‑in by its asset ID."
-        ),
-    )
+    # Look for .env file in the project root and load it
+    env_file = Path(__file__).parent.parent / ".env"
+    load_dotenv(dotenv_path=env_file)
+
+    # Get transport from environment variable, default to "stdio"
+    transport = os.getenv("TRANSPORT", "stdio").lower()
+
+    # Validate transport type
+    if transport not in ["sse", "stdio", "http"]:
+        print(f"Warning: Invalid transport '{transport}' in .env file. Using 'stdio' instead.")
+        transport = "stdio"
+
+    # Get host, port, and path configuration
+    host = os.getenv("HOST", "0.0.0.0")
+    port = int(os.getenv("PORT", "8000"))
+    path = os.getenv("PATH_PREFIX", "/")
+    sse_path = os.getenv("SSE_PATH", "/sse")
+
+    return {
+        "transport": transport,
+        "host": host,
+        "port": port,
+        "path": path,
+        "sse_path": sse_path
+    }
 
 
 # Create the MCP server instance
-mcp = create_server()
+mcp = FastMCP("Office Add‑ins MCP Server")
 
 
-@mcp.tool(
-    name="get_addin_details",
-    description="Fetch details of a Microsoft Office add‑in by its asset ID.",
-    tags={"office", "addins", "api"},
-)
-async def get_addin_details_tool(asset_id: str) -> dict:
-    """MCP tool wrapper for get_addin_details."""
-    return await get_addin_details(asset_id)
+def register_tools() -> None:
+    """Register all tools with the MCP server.
+
+    Parameters
+    ----------
+    mcp : FastMCP
+        The FastMCP server instance to register tools with.
+    """
+    @mcp.tool(
+        name="get_addin_details",
+        description="Fetch details of a Microsoft Office add‑in by its asset ID.",
+    )
+    async def get_addin_details_tool(asset_id: str) -> dict:
+        """MCP tool wrapper for get_addin_details."""
+        return await get_addin_details(asset_id)
+
+
+def run_server() -> None:
+    """Run the MCP server with configuration from .env file.
+
+    Loads server configuration from .env file and starts the FastMCP server.
+    Configuration includes transport type, host, port, and path prefix.
+    """
+    try:
+        # Load server configuration from .env file
+        config = load_server_config()
+
+        # Register all tools with the server
+        register_tools()
+
+        # Start the server with the specified transport and configuration
+        if config["transport"] == "stdio":
+            # STDIO transport for local CLI clients
+            mcp.run(transport="stdio")
+        elif config["transport"] == "sse":
+            # SSE transport for web service deployment
+            mcp.run(transport="sse", host=config["host"], port=config["port"], path=config["sse_path"])
+        elif config["transport"] == "http":
+            # HTTP transport for streamable HTTP requests
+            mcp.run(transport="streamable-http", host=config["host"], port=config["port"], path=config["path"])
+
+    except KeyboardInterrupt:
+        print("\nServer shutdown requested by user")
+    except Exception as e:
+        print(f"Error starting MCP server: {e}")
+        sys.exit(1)
 
 
 def main() -> None:
     """Entry point for running the MCP server.
 
-    When executed as a script, this function starts the FastMCP server using
-    Server‑Sent Events (SSE) transport.  The server listens on all
-    network interfaces on port 8000.  Adjust the host and port as needed
-    for your deployment environment.
+    When executed as a script, this function loads transport configuration from
+    .env file, registers tools and starts the FastMCP server.
     """
-    # Start the server with SSE transport.  This runs an ASGI application
-    # under the hood using Uvicorn.  Pass `transport="stdio"` instead
-    # for local tools (e.g. CLI clients)【410474369011793†L221-L227】.
-    mcp.run(transport="sse", host="0.0.0.0", port=8000)
+    run_server()
 
 
 if __name__ == "__main__":
