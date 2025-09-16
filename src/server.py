@@ -10,9 +10,11 @@ Features:
 
 from __future__ import annotations
 
+import logging
 import os
 from pathlib import Path
 import sys
+from datetime import datetime
 
 from dotenv import load_dotenv
 
@@ -20,7 +22,7 @@ from dotenv import load_dotenv
 # mcp.server.fastmcp module.
 from mcp.server.fastmcp import FastMCP
 
-from .tools import get_addin_details
+from tools import get_addin_details
 
 
 def load_server_config() -> dict:
@@ -36,14 +38,19 @@ def load_server_config() -> dict:
     """
     # Look for .env file in the project root and load it
     env_file = Path(__file__).parent.parent / ".env"
-    load_dotenv(dotenv_path=env_file)
+    logger.info(f"Loading configuration from: {env_file}")
+    if env_file.exists():
+        load_dotenv(dotenv_path=env_file)
+        logger.info("Configuration loaded from .env file")
+    else:
+        logger.info("No .env file found, using default configuration")
 
     # Get transport from environment variable, default to "stdio"
     transport = os.getenv("TRANSPORT", "stdio").lower()
 
     # Validate transport type
     if transport not in ["sse", "stdio", "http"]:
-        print(f"Warning: Invalid transport '{transport}' in .env file. Using 'stdio' instead.")
+        logger.warning(f"Invalid transport '{transport}' in configuration. Using 'stdio' instead.")
         transport = "stdio"
 
     # Get host, port, and path configuration
@@ -61,6 +68,16 @@ def load_server_config() -> dict:
     }
 
 
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.StreamHandler(sys.stdout)
+    ]
+)
+logger = logging.getLogger("office-addins-mcp")
+
 # Create the MCP server instance
 mcp = FastMCP("Office Add‑ins MCP Server")
 
@@ -73,13 +90,18 @@ def register_tools() -> None:
     mcp : FastMCP
         The FastMCP server instance to register tools with.
     """
+    logger.info("Registering MCP tools...")
+    
     @mcp.tool(
         name="get_addin_details",
         description="Fetch details of a Microsoft Office add‑in by its asset ID.",
     )
     async def get_addin_details_tool(asset_id: str) -> dict:
         """MCP tool wrapper for get_addin_details."""
+        logger.debug(f"Fetching add-in details for asset ID: {asset_id}")
         return await get_addin_details(asset_id)
+    
+    logger.info("Successfully registered 1 tool: get_addin_details")
 
 
 def run_server() -> None:
@@ -89,27 +111,34 @@ def run_server() -> None:
     Configuration includes transport type, host, port, and path prefix.
     """
     try:
+        logger.info("=" * 60)
+        logger.info("🚀 Starting Office Add-ins MCP Server")
+        logger.info("=" * 60)
+        logger.info(f"Start time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+        
         # Load server configuration from .env file
         config = load_server_config()
+        logger.info(f"Server configuration: {config}")
 
         # Register all tools with the server
         register_tools()
 
         # Start the server with the specified transport and configuration
         if config["transport"] == "stdio":
-            # STDIO transport for local CLI clients
+            logger.info("🔌 Starting server with STDIO transport for local CLI clients")
             mcp.run(transport="stdio")
         elif config["transport"] == "sse":
-            # SSE transport for web service deployment
+            logger.info(f"🌐 Starting server with SSE transport at {config['host']}:{config['port']}{config['sse_path']}")
             mcp.run(transport="sse", host=config["host"], port=config["port"], path=config["sse_path"])
         elif config["transport"] == "http":
-            # HTTP transport for streamable HTTP requests
+            logger.info(f"🌐 Starting server with HTTP transport at {config['host']}:{config['port']}{config['path']}")
             mcp.run(transport="streamable-http", host=config["host"], port=config["port"], path=config["path"])
 
     except KeyboardInterrupt:
-        print("\nServer shutdown requested by user")
+        logger.info("\n⏹️  Server shutdown requested by user")
+        sys.exit(0)
     except Exception as e:
-        print(f"Error starting MCP server: {e}")
+        logger.error(f"❌ Error starting MCP server: {e}")
         sys.exit(1)
 
 
@@ -119,6 +148,7 @@ def main() -> None:
     When executed as a script, this function loads transport configuration from
     .env file, registers tools and starts the FastMCP server.
     """
+    logger.info("Initializing Office Add-ins MCP Server...")
     run_server()
 
 
