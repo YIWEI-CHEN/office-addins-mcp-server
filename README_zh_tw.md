@@ -1,6 +1,10 @@
 # Office Add‑ins MCP Server
 [English Version](./README.md)
 
+## 最新消息
+
+**2024-09-13** -  MCP 伺服器開始開發，目前已實作 `get_addin_details` 工具。
+
 ## 簡介
 
 用於探索和管理跨 Word、Excel、PowerPoint、Outlook 和 Teams 的 Microsoft Office 外掛程式的 Model Context Protocol (MCP) 伺服器。此伺服器讓 AI 代理能夠搜尋外掛程式並檢索詳細中繼資料、安裝或卸載外掛程式、處理自訂外掛程式的提交、驗證和發布。

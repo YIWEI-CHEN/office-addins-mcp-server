@@ -1,6 +1,10 @@
 # Office Add‑ins MCP Server
 [中文版本](./README_zh_tw.md)
 
+## News
+
+**2024-09-13** - Launched the MCP server development
+
 ## Overview
 
 A Model Context Protocol (MCP) server for discovering and managing Microsoft Office Add‑ins across Word, Excel, PowerPoint, Outlook, and Teams. This server enables AI agents to search add-ins and retrieve detailed metadata, install or uninstall add-ins, handle submission, validation, and publishing of custom add-ins.
