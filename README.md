@@ -28,32 +28,36 @@ Currently, the server provides basic add-in detail retrieval functionality, with
 
 ## Deployment Options
 
-This project offers two deployment options:
+This project offers multiple deployment options:
 
 ### 1. 🏠 Standalone MCP Server (Original)
 A traditional MCP server using FastMCP, ideal for local development and direct integration.
 
-### 2. ☁️ Azure Functions MCP Server (Serverless) ⚠️
+### 2. ☁️ Azure App Service Deployment (Recommended)
+Deploy the MCP server as a web service on Azure App Service using Azure Developer CLI (azd). This provides a production-ready HTTP endpoint with automatic scaling and monitoring.
+
+### 3. ☁️ Azure Functions MCP Server (Serverless) ⚠️
 A serverless implementation using Azure Functions with MCP extension support, perfect for cloud deployment with automatic scaling.
 
-> **⚠️ Note**: The Azure Functions implementation has not been fully tested and verified yet. Use the standalone server for production workloads until further testing is completed.
+> **⚠️ Note**: The Azure Functions implementation has not been fully tested and verified yet. Use the Azure App Service deployment for production workloads.
 
 **For Azure Functions deployment, see:** [`azure-functions/`](./azure-functions/) directory
 
 ### 🔑 **Key Differences Between Implementations**
 
-| Aspect | Standalone Server | Azure Functions |
-|--------|------------------|------------------|
-| **Name** | `office-addins-mcp-server` | `office-addins-mcp-server-azure` |
-| **Dependencies** | `mcp[cli]` | `azure-functions`, `azure-functions-worker` |
-| **Keywords** | `mcp`, `server` | `azure-functions`, `serverless` |
-| **Entry Points** | CLI script included | Function app only |
-| **Build Target** | Python package | Azure Functions deployment |
-| **Deployment** | Self-hosted or local | Serverless cloud deployment |
-| **Scaling** | Manual | Automatic |
-| **Cost Model** | Fixed hosting costs | Pay-per-execution |
-| **Configuration** | Command-line arguments | `host.json` + environment variables |
-| **Status** | ✅ Stable | ⚠️ Experimental |
+| Aspect | Standalone Server | Azure App Service | Azure Functions |
+|--------|------------------|------------------|------------------|
+| **Name** | `office-addins-mcp-server` | `office-addins-mcp-server` | `office-addins-mcp-server-azure` |
+| **Dependencies** | `mcp[cli]` | `mcp[cli]`, `starlette`, `gunicorn` | `azure-functions`, `azure-functions-worker` |
+| **Keywords** | `mcp`, `server` | `mcp`, `web-service` | `azure-functions`, `serverless` |
+| **Entry Points** | CLI script included | Web app (HTTP/HTTPS) | Function app only |
+| **Build Target** | Python package | Web application | Azure Functions deployment |
+| **Deployment** | Self-hosted or local | Azure App Service (PaaS) | Serverless cloud deployment |
+| **Scaling** | Manual | Automatic (up/down scaling) | Automatic (event-driven) |
+| **Cost Model** | Fixed hosting costs | Fixed App Service Plan costs | Pay-per-execution |
+| **Configuration** | Command-line arguments | Environment variables + Bicep | `host.json` + environment variables |
+| **Protocol** | STDIO, SSE, HTTP | HTTP with SSE transport | HTTP |
+| **Status** | ✅ Stable | ✅ Production Ready | ⚠️ Experimental |
 
 ---
 
@@ -130,6 +134,101 @@ python office_addins_mcp_server/server.py --transport stdio
 - **`sse`**: Server-Sent Events transport, ideal for web service deployment
 - **`http`**: Streamable HTTP transport, suitable for HTTP-based integrations
 
+## 🧪 Experimental Remote Server
+
+> **⚠️ EXPERIMENTAL**: A remote instance of this MCP server is available for testing purposes only. This is not intended for production use and may have limited uptime, rate limits, or be discontinued without notice.
+
+**Remote MCP Endpoint**: `https://app-api-gmqmpcvoduxtc.azurewebsites.net/addins/mcp`
+
+**Usage**: You can test the MCP protocol with this endpoint, but please deploy your own instance for any serious work.
+
+## Azure App Service Deployment
+
+Deploy the MCP server to Azure App Service for production use with automatic scaling, monitoring, and a public HTTPS endpoint.
+
+### Prerequisites
+
+1. **Azure Developer CLI (azd)**:
+   ```bash
+   # Install azd (cross-platform)
+   curl -fsSL https://aka.ms/install-azd.sh | bash
+   
+   # Or on Windows with PowerShell
+   powershell -ExecutionPolicy ByPass -c "irm https://aka.ms/install-azd.ps1 | iex"
+   ```
+
+2. **Azure Subscription**: Ensure you have an active Azure subscription
+
+### Deployment Steps
+
+1. **Authenticate with Azure**:
+   ```bash
+   azd auth login
+   ```
+
+3. **Initialize and deploy**:
+   ```bash
+   # Initialize the project (first time only)
+   azd init
+   
+   # Deploy infrastructure and application
+   azd up
+   ```
+
+4. **Follow the prompts**:
+   - Select your Azure subscription
+   - Choose an Azure region (e.g., East US, West US 2)
+   - Enter an environment name (e.g., `office-addins-prod`)
+
+### Deployment Output
+
+After successful deployment, you'll get:
+- **App Service URL**: `https://app-api-{unique-id}.azurewebsites.net`
+- **MCP Endpoint**: `https://app-api-{unique-id}.azurewebsites.net/addins/mcp`
+- **Resource Group**: `rg-{environment-name}`
+
+### Testing the Deployed Service
+
+```bash
+# Test the MCP server endpoint
+curl -H "Accept: text/event-stream" \
+     https://your-app-url.azurewebsites.net/addins/mcp
+
+# Expected response: MCP JSON-RPC message with session requirements
+```
+
+### Configuration
+
+The deployment creates:
+- **App Service Plan**: Basic B1 (Linux, can be scaled up/down)
+- **Python Runtime**: 3.11
+- **Web Server**: Gunicorn with Uvicorn workers
+- **Environment Variables**: HOST, PORT, DEBUG configured automatically
+- **HTTPS**: Enabled by default with Azure-managed certificates
+
+### Managing the Deployment
+
+```bash
+# Redeploy application code only
+azd deploy
+
+# View deployment status
+azd show
+
+# Monitor logs (requires Azure CLI)
+az webapp log tail --name your-app-name --resource-group your-rg-name
+
+# Clean up resources
+azd down
+```
+
+### Updating the Application
+
+To update the deployed application:
+1. Make changes to your code
+2. Run `azd deploy` to redeploy just the application
+3. The infrastructure remains unchanged unless you modify the Bicep templates
+
 ## Testing the Server
 
 To verify that the server works, connect with an MCP‑compatible client and
@@ -193,5 +292,6 @@ office-addins-mcp-server/
 ``` -->
 
 **Choose your deployment:**
-- **Local/Standalone**: Use the root directory files
+- **Local/Standalone**: Use `uv run office-addins-mcp-server` in the root directory
+- **Azure App Service**: Use `azd up` in the root directory
 - **Azure Functions**: Use the `azure-functions/` directory

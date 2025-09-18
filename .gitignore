@@ -249,3 +249,6 @@ temp/
 secrets.json
 .secrets
 api_keys.txt
+
+# Azure Developer CLI
+.azure/
