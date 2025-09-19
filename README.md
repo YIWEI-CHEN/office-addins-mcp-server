@@ -95,10 +95,12 @@ python office_addins_mcp_server/server.py --transport stdio
 
 **Usage**: You can test the MCP protocol with this endpoint, but please deploy your own instance for any serious work.
 
-## Testing the Server
+## Testing and Examples
+
+### Testing the Server
 
 To verify that the server works, connect with an MCP‑compatible client and
-invoke the `get_addin_details` tool.  The official SDK provides CLI tools
+invoke the `get_addin_details` or `search_addins` tools.  The official SDK provides CLI tools
 via `uv run mcp`.  For example:
 
 ```bash
@@ -112,8 +114,30 @@ uv run mcp install office_addins_mcp_server/server.py
 uv run office-addins-mcp-server
 ```
 
+### Example Scripts and Demonstrations
+
+The `examples/` folder contains useful scripts for testing and demonstrating the server functionality:
+
+```bash
+# Run comprehensive demonstration of search capabilities
+uv run python examples/demo_search.py
+
+# Test server configuration and tool registration
+uv run python examples/test_server.py
+
+# Run the full test suite
+uv run pytest tests/
+```
+
+The demonstration script showcases:
+- Basic add-in search functionality
+- Advanced filtering (by client, category, pricing)
+- Pagination and sorting options
+- Specific add-in lookup by asset ID
+- Detailed add-in information retrieval
+
 Once running, you can connect using Claude Desktop or the MCP Inspector to
-test the tool.  Refer to the official documentation for writing custom
+test the tools.  Refer to the official documentation for writing custom
 clients.
 
 

@@ -19,7 +19,7 @@ import click
 # mcp.server.fastmcp module.
 from mcp.server.fastmcp import FastMCP
 
-from office_addins_mcp_server.tools import get_addin_details
+from office_addins_mcp_server.tools import get_addin_details, search_addins
 
 
 # Configure logging
@@ -52,7 +52,46 @@ def register_tools(mcp: FastMCP) -> None:
         logger.debug(f"Fetching add-in details for asset ID: {asset_id}")
         return await get_addin_details(asset_id)
     
-    logger.info("Successfully registered 1 tool: get_addin_details")
+    @mcp.tool(
+        name="search_addins",
+        description="Search for Office Add-ins using comprehensive filtering, sorting, and pagination options.",
+    )
+    async def search_addins_tool(
+        query: str | None = None,
+        category: list[str] | None = None,
+        free: bool | None = None,
+        clients: list[str] | None = None,
+        productgroup: list[str] | None = None,
+        productids: list[str] | None = None,
+        assetids: list[str] | None = None,
+        providertype: str | None = None,
+        orderfield: str | None = None,
+        orderby: str | None = None,
+        top: int | None = None,
+        skiptoitem: int | None = None,
+        date: str | None = None,
+        getMetaOSApps: bool | None = None,
+    ) -> dict:
+        """MCP tool wrapper for search_addins."""
+        logger.debug(f"Searching add-ins with query: {query}, filters: {locals()}")
+        return await search_addins(
+            query=query,
+            category=category,
+            free=free,
+            clients=clients,
+            productgroup=productgroup,
+            productids=productids,
+            assetids=assetids,
+            providertype=providertype,
+            orderfield=orderfield,
+            orderby=orderby,
+            top=top,
+            skiptoitem=skiptoitem,
+            date=date,
+            getMetaOSApps=getMetaOSApps,
+        )
+    
+    logger.info("Successfully registered 2 tools: get_addin_details, search_addins")
 
 
 def create_mcp_server() -> FastMCP:
