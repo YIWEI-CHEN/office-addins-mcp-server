@@ -9,6 +9,21 @@
 
 目前，此伺服器提供基本的外掛程式詳細資訊檢索功能，並規劃在未來版本中提供全面的外掛程式管理功能（請參閱開發路線圖部分）。
 
+## 部署選項
+
+此專案提供多種部署選項：
+
+### 1. 🏠 獨立 MCP 伺服器（本地）
+使用 FastMCP 的傳統 MCP 伺服器，適合本地開發和與 MCP 兼容客戶端的直接整合。
+
+### 2. ☁️ Azure App Service 部署（推薦）
+使用 Azure Developer CLI (azd) 將 MCP 伺服器部署為 Azure App Service 上的 Web 服務。提供具有自動擴展和監控功能的生產就緒 HTTP 端點。
+
+### 3. ☁️ Azure Functions（無伺服器）
+對於使用 Azure Functions 的無伺服器部署，請參閱 [`azure-functions` 分支](https://github.com/YIWEI-CHEN/office-addins-mcp-server/tree/azure-functions) 獲取完整的無伺服器實作。
+
+---
+
 ## 安裝與設定
 
 此專案使用 [uv](https://docs.astral.sh/uv/) 來管理 Python 依賴項目和虛擬環境，並包含 `pyproject.toml` 配置文件和 `uv.lock` 文件以確保跨不同環境的可重現構建。

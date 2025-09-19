@@ -30,34 +30,14 @@ Currently, the server provides basic add-in detail retrieval functionality, with
 
 This project offers multiple deployment options:
 
-### 1. 🏠 Standalone MCP Server (Original)
-A traditional MCP server using FastMCP, ideal for local development and direct integration.
+### 1. 🏠 Standalone MCP Server (Local)
+A traditional MCP server using FastMCP, ideal for local development and direct integration with MCP-compatible clients.
 
 ### 2. ☁️ Azure App Service Deployment (Recommended)
 Deploy the MCP server as a web service on Azure App Service using Azure Developer CLI (azd). This provides a production-ready HTTP endpoint with automatic scaling and monitoring.
 
-### 3. ☁️ Azure Functions MCP Server (Serverless) ⚠️
-A serverless implementation using Azure Functions with MCP extension support, perfect for cloud deployment with automatic scaling.
-
-> **⚠️ Note**: The Azure Functions implementation has not been fully tested and verified yet. Use the Azure App Service deployment for production workloads.
-
-**For Azure Functions deployment, see:** [`azure-functions/`](./azure-functions/) directory
-
-### 🔑 **Key Differences Between Implementations**
-
-| Aspect | Standalone Server | Azure App Service | Azure Functions |
-|--------|------------------|------------------|------------------|
-| **Name** | `office-addins-mcp-server` | `office-addins-mcp-server` | `office-addins-mcp-server-azure` |
-| **Dependencies** | `mcp[cli]` | `mcp[cli]`, `starlette`, `gunicorn` | `azure-functions`, `azure-functions-worker` |
-| **Keywords** | `mcp`, `server` | `mcp`, `web-service` | `azure-functions`, `serverless` |
-| **Entry Points** | CLI script included | Web app (HTTP/HTTPS) | Function app only |
-| **Build Target** | Python package | Web application | Azure Functions deployment |
-| **Deployment** | Self-hosted or local | Azure App Service (PaaS) | Serverless cloud deployment |
-| **Scaling** | Manual | Automatic (up/down scaling) | Automatic (event-driven) |
-| **Cost Model** | Fixed hosting costs | Fixed App Service Plan costs | Pay-per-execution |
-| **Configuration** | Command-line arguments | Environment variables + Bicep | `host.json` + environment variables |
-| **Protocol** | STDIO, SSE, HTTP | HTTP with SSE transport | HTTP |
-| **Status** | ✅ Stable | ✅ Production Ready | ⚠️ Experimental |
+### 3. ☁️ Azure Functions (Serverless) 
+For serverless deployment using Azure Functions, see the [`azure-functions` branch](https://github.com/YIWEI-CHEN/office-addins-mcp-server/tree/azure-functions) for a complete serverless implementation.
 
 ---
 
@@ -294,4 +274,4 @@ office-addins-mcp-server/
 **Choose your deployment:**
 - **Local/Standalone**: Use `uv run office-addins-mcp-server` in the root directory
 - **Azure App Service**: Use `azd up` in the root directory
-- **Azure Functions**: Use the `azure-functions/` directory
+- **Azure Functions**: Switch to the [`azure-functions` branch](https://github.com/YIWEI-CHEN/office-addins-mcp-server/tree/azure-functions) for serverless deployment
