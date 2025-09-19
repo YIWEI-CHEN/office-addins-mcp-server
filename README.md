@@ -28,20 +28,19 @@ Currently, the server provides basic add-in detail retrieval functionality, with
 
 ## Deployment Options
 
-This project offers multiple deployment options:
+This project offers two deployment options:
 
 ### 1. 🏠 Standalone MCP Server (Local)
 A traditional MCP server using FastMCP, ideal for local development and direct integration with MCP-compatible clients.
 
-### 2. ☁️ Azure App Service Deployment (Recommended)
+### 2. ☁️ Azure App Service Deployment (Remote)
 Deploy the MCP server as a web service on Azure App Service using Azure Developer CLI (azd). This provides a production-ready HTTP endpoint with automatic scaling and monitoring.
 
-### 3. ☁️ Azure Functions (Serverless) 
-For serverless deployment using Azure Functions, see the [`azure-functions` branch](https://github.com/YIWEI-CHEN/office-addins-mcp-server/tree/azure-functions) for a complete serverless implementation.
+📖 **[Complete Azure App Service Deployment Guide →](./AZURE_APP_SERVICE.md)**
 
 ---
 
-## Installation and Setup (Standalone Server)
+## Installation and Setup (Local Server)
 
 This project uses [uv](https://docs.astral.sh/uv/) to manage Python dependencies and virtual environments and includes a `pyproject.toml` configuration file and a `uv.lock` file to ensure reproducible builds across different environments.
 
@@ -122,92 +121,25 @@ python office_addins_mcp_server/server.py --transport stdio
 
 **Usage**: You can test the MCP protocol with this endpoint, but please deploy your own instance for any serious work.
 
-## Azure App Service Deployment
+## Azure App Service Deployment (Quick Start)
 
-Deploy the MCP server to Azure App Service for production use with automatic scaling, monitoring, and a public HTTPS endpoint.
-
-### Prerequisites
-
-1. **Azure Developer CLI (azd)**:
-   ```bash
-   # Install azd (cross-platform)
-   curl -fsSL https://aka.ms/install-azd.sh | bash
-   
-   # Or on Windows with PowerShell
-   powershell -ExecutionPolicy ByPass -c "irm https://aka.ms/install-azd.ps1 | iex"
-   ```
-
-2. **Azure Subscription**: Ensure you have an active Azure subscription
-
-### Deployment Steps
-
-1. **Authenticate with Azure**:
-   ```bash
-   azd auth login
-   ```
-
-3. **Initialize and deploy**:
-   ```bash
-   # Initialize the project (first time only)
-   azd init
-   
-   # Deploy infrastructure and application
-   azd up
-   ```
-
-4. **Follow the prompts**:
-   - Select your Azure subscription
-   - Choose an Azure region (e.g., East US, West US 2)
-   - Enter an environment name (e.g., `office-addins-prod`)
-
-### Deployment Output
-
-After successful deployment, you'll get:
-- **App Service URL**: `https://app-api-{unique-id}.azurewebsites.net`
-- **MCP Endpoint**: `https://app-api-{unique-id}.azurewebsites.net/addins/mcp`
-- **Resource Group**: `rg-{environment-name}`
-
-### Testing the Deployed Service
+For production deployment to Azure App Service with automatic scaling and monitoring:
 
 ```bash
-# Test the MCP server endpoint
-curl -H "Accept: text/event-stream" \
-     https://your-app-url.azurewebsites.net/addins/mcp
+# Install Azure Developer CLI
+curl -fsSL https://aka.ms/install-azd.sh | bash
 
-# Expected response: MCP JSON-RPC message with session requirements
-```
+# Authenticate with Azure
+azd auth login
 
-### Configuration
+# Deploy to Azure (first time)
+azd up
 
-The deployment creates:
-- **App Service Plan**: Basic B1 (Linux, can be scaled up/down)
-- **Python Runtime**: 3.11
-- **Web Server**: Gunicorn with Uvicorn workers
-- **Environment Variables**: HOST, PORT, DEBUG configured automatically
-- **HTTPS**: Enabled by default with Azure-managed certificates
-
-### Managing the Deployment
-
-```bash
-# Redeploy application code only
+# Redeploy after changes
 azd deploy
-
-# View deployment status
-azd show
-
-# Monitor logs (requires Azure CLI)
-az webapp log tail --name your-app-name --resource-group your-rg-name
-
-# Clean up resources
-azd down
 ```
 
-### Updating the Application
-
-To update the deployed application:
-1. Make changes to your code
-2. Run `azd deploy` to redeploy just the application
-3. The infrastructure remains unchanged unless you modify the Bicep templates
+📖 **[Complete Azure App Service Deployment Guide →](./AZURE_APP_SERVICE.md)**
 
 ## Testing the Server
 
@@ -271,7 +203,6 @@ office-addins-mcp-server/
 └── README.md                  # This file
 ``` -->
 
-**Choose your deployment:**
+<!-- **Choose your deployment:**
 - **Local/Standalone**: Use `uv run office-addins-mcp-server` in the root directory
-- **Azure App Service**: Use `azd up` in the root directory
-- **Azure Functions**: Switch to the [`azure-functions` branch](https://github.com/YIWEI-CHEN/office-addins-mcp-server/tree/azure-functions) for serverless deployment
+- **Azure App Service**: Use `azd up` in the root directory -->

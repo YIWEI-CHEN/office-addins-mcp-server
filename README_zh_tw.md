@@ -11,16 +11,15 @@
 
 ## 部署選項
 
-此專案提供多種部署選項：
+此專案提供兩種部署選項：
 
 ### 1. 🏠 獨立 MCP 伺服器（本地）
 使用 FastMCP 的傳統 MCP 伺服器，適合本地開發和與 MCP 兼容客戶端的直接整合。
 
-### 2. ☁️ Azure App Service 部署（推薦）
+### 2. ☁️ Azure App Service 部署（生產環境）
 使用 Azure Developer CLI (azd) 將 MCP 伺服器部署為 Azure App Service 上的 Web 服務。提供具有自動擴展和監控功能的生產就緒 HTTP 端點。
 
-### 3. ☁️ Azure Functions（無伺服器）
-對於使用 Azure Functions 的無伺服器部署，請參閱 [`azure-functions` 分支](https://github.com/YIWEI-CHEN/office-addins-mcp-server/tree/azure-functions) 獲取完整的無伺服器實作。
+📖 **[完整 Azure App Service 部署指南 →](./AZURE_APP_SERVICE.md)**
 
 ---
 
