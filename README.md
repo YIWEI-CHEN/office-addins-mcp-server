@@ -14,32 +14,6 @@ resources with minimal boilerplate.
 
 Currently, the server provides basic add-in detail retrieval functionality, with comprehensive add-in management features planned for future releases (see Roadmap section).
 
-<!-- ## Features
-
-* **Standardized interface:** MCP servers act like APIs for LLMs, allowing
-  secure access to internal tools or data.
-* **FastMCP convenience:** The SDK generates tool schemas from type hints
-  and docstrings, minimizing boilerplate while supporting both synchronous
-  and asynchronous functions.
-* **Multiple transports:** Supports STDIO for local testing and CLI integration,
-  Server‑Sent Events (SSE) for remote clients, and HTTP for streamable HTTP requests.
-* **Async HTTP:** The tool uses `httpx.AsyncClient` to call the Office
-  Add‑ins API without blocking the event loop. -->
-
-## Deployment Options
-
-This project offers two deployment options:
-
-### 1. 🏠 Standalone MCP Server (Local)
-A traditional MCP server using FastMCP, ideal for local development and direct integration with MCP-compatible clients.
-
-### 2. ☁️ Azure App Service Deployment (Remote)
-Deploy the MCP server as a web service on Azure App Service using Azure Developer CLI (azd). This provides a production-ready HTTP endpoint with automatic scaling and monitoring.
-
-📖 **[Complete Azure App Service Deployment Guide →](./AZURE_APP_SERVICE.md)**
-
----
-
 ## Installation and Setup (Local Server)
 
 This project uses [uv](https://docs.astral.sh/uv/) to manage Python dependencies and virtual environments and includes a `pyproject.toml` configuration file and a `uv.lock` file to ensure reproducible builds across different environments.
@@ -121,26 +95,6 @@ python office_addins_mcp_server/server.py --transport stdio
 
 **Usage**: You can test the MCP protocol with this endpoint, but please deploy your own instance for any serious work.
 
-## Azure App Service Deployment (Quick Start)
-
-For production deployment to Azure App Service with automatic scaling and monitoring:
-
-```bash
-# Install Azure Developer CLI
-curl -fsSL https://aka.ms/install-azd.sh | bash
-
-# Authenticate with Azure
-azd auth login
-
-# Deploy to Azure (first time)
-azd up
-
-# Redeploy after changes
-azd deploy
-```
-
-📖 **[Complete Azure App Service Deployment Guide →](./AZURE_APP_SERVICE.md)**
-
 ## Testing the Server
 
 To verify that the server works, connect with an MCP‑compatible client and
@@ -161,6 +115,26 @@ uv run office-addins-mcp-server
 Once running, you can connect using Claude Desktop or the MCP Inspector to
 test the tool.  Refer to the official documentation for writing custom
 clients.
+
+
+## Azure App Service Deployment (Quick Start)
+Deploy the MCP server as a web service on Azure App Service using Azure Developer CLI (azd). This provides a production-ready HTTP endpoint with automatic scaling and monitoring.
+
+```bash
+# Install Azure Developer CLI
+curl -fsSL https://aka.ms/install-azd.sh | bash
+
+# Authenticate with Azure
+azd auth login
+
+# Deploy to Azure (first time)
+azd up
+
+# Redeploy after changes
+azd deploy
+```
+
+📖 **[Complete Azure App Service Deployment Guide →](./AZURE_APP_SERVICE.md)**
 
 ## Announcements
 

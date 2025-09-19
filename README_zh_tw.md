@@ -3,27 +3,13 @@
 
 ## 簡介
 
-用於探索和管理跨 Word、Excel、PowerPoint、Outlook 和 Teams 的 Microsoft Office 外掛程式的 Model Context Protocol (MCP) 伺服器。
+用於探索和管理跨 Word、Excel、PowerPoint、Outlook 和 Teams 的 Microsoft Office 外掛程式的 Model Context Protocol (MCP) 伺服器。此伺服器讓 AI Agent 能夠搜尋外掛程式並檢索詳細的中繼資料、安裝或卸載外掛程式、處理自訂外掛程式的提交、驗證和發佈。
 
-這個儲存庫提供一個基於 **Model Context Protocol (MCP)** 的伺服器實作，使用官方 Python SDK。MCP 標準化大型語言模型（LLM）與外部資料來源和工具的通訊方式。`FastMCP` 類別封裝了 MCP 的複雜性，讓開發者能夠以最少的樣板程式碼將普通的 Python 函式公開為 MCP 工具或資源。
+這個儲存庫提供一個基於 **Model Context Protocol (MCP)** 的完整伺服器實作，使用官方 Python SDK。MCP 標準化大型語言模型（LLM）與外部資料來源和工具的通訊方式。`FastMCP` 類別封裝了 MCP 的複雜性，讓開發者能夠以最少的樣板程式碼將普通的 Python 函式公開為 MCP 工具或資源。
 
 目前，此伺服器提供基本的外掛程式詳細資訊檢索功能，並規劃在未來版本中提供全面的外掛程式管理功能（請參閱開發路線圖部分）。
 
-## 部署選項
-
-此專案提供兩種部署選項：
-
-### 1. 🏠 獨立 MCP 伺服器（本地）
-使用 FastMCP 的傳統 MCP 伺服器，適合本地開發和與 MCP 兼容客戶端的直接整合。
-
-### 2. ☁️ Azure App Service 部署（生產環境）
-使用 Azure Developer CLI (azd) 將 MCP 伺服器部署為 Azure App Service 上的 Web 服務。提供具有自動擴展和監控功能的生產就緒 HTTP 端點。
-
-📖 **[完整 Azure App Service 部署指南 →](./AZURE_APP_SERVICE.md)**
-
----
-
-## 安裝與設定
+## 安裝與設定（本地伺服器）
 
 此專案使用 [uv](https://docs.astral.sh/uv/) 來管理 Python 依賴項目和虛擬環境，並包含 `pyproject.toml` 配置文件和 `uv.lock` 文件以確保跨不同環境的可重現構建。
 
@@ -51,35 +37,17 @@
 # 選項 1：使用已安裝的腳本（推薦）
 uv run office-addins-mcp-server
 
-# 選項 2：使用 uv run 直接路徑
-uv run python office_addins_mcp_server/server.py
+# 選項 2：使用特定傳輸類型
+uv run office-addins-mcp-server --transport stdio
+uv run office-addins-mcp-server --transport sse
+uv run office-addins-mcp-server --transport http
 
-# 選項 3：啟動虛擬環境後
+# 選項 3：使用 uv run 直接路徑
+uv run python office_addins_mcp_server/server.py --transport stdio
+
+# 選項 4：啟動虛擬環境後
 source .venv/bin/activate
-python office_addins_mcp_server/server.py
-```
-
-## 伺服器配置
-
-伺服器支援多種傳輸類型，可以使用環境變數進行配置：
-
-<!-- ### 傳輸配置 -->
-
-在專案根目錄創建 `.env` 文件來配置伺服器：
-
-```bash
-# .env 文件
-
-# 傳輸配置
-TRANSPORT=stdio  # 預設：標準輸入/輸出
-# TRANSPORT=sse   # Server-Sent Events 用於 Web 部署
-# TRANSPORT=http  # 串流 HTTP 傳輸
-
-# 網路配置（用於 SSE 和 HTTP 傳輸）
-HOST=0.0.0.0     # 預設：監聽所有介面
-PORT=8000        # 預設：Port 8000
-PATH_PREFIX=/    # 預設：根路徑（用於未來的 HTTP 路由）
-SSE_PATH=/sse    # 預設：SSE 端點路徑
+python office_addins_mcp_server/server.py --transport stdio
 ```
 
 **傳輸類型：**
@@ -87,22 +55,13 @@ SSE_PATH=/sse    # 預設：SSE 端點路徑
 - **`sse`**：Server-Sent Events 傳輸，適合 Web 服務部署
 - **`http`**：串流 HTTP 傳輸，適用於基於 HTTP 的整合
 
-<!-- ### 配置選項
+## 🧪 實驗性遠端伺服器
 
-**可用的環境變數：**
-- `TRANSPORT`：傳輸類型（`stdio`、`sse`、`http`）- 預設：`stdio`
-- `HOST`：綁定的主機 - 預設：`0.0.0.0`（所有介面）
-- `PORT`：監聽的端口 - 預設：`8000`
-- `PATH_PREFIX`：HTTP 路由的路徑前綴 - 預設：`/`
-- `SSE_PATH`：SSE 端點路徑 - 預設：`/sse`
+> **⚠️ 實驗性功能**：此 MCP 伺服器的遠端實例僅供測試使用。此服務不適用於生產環境，可能有有限的運行時間、速率限制，或可能在無預警的情況下終止服務。
 
-### 預設設定
+**遠端 MCP 端點**：`https://app-api-gmqmpcvoduxtc.azurewebsites.net/addins/mcp`
 
-預設情況下，伺服器：
-- 使用 STDIO 傳輸
-- 監聽 `0.0.0.0:8000`（用於 SSE/HTTP 傳輸）
-- 使用根路徑（`/`）進行路由
-- 如果存在則從 `.env` 文件載入所有配置 -->
+**使用方式**：您可以使用此端點測試 MCP 協定，但請為任何正式工作部署您自己的實例。
 
 ## 測試伺服器
 
@@ -120,6 +79,26 @@ uv run office-addins-mcp-server
 ```
 
 運行後，您可以使用 Claude Desktop 或 MCP Inspector 連接來測試工具。請參考官方文檔編寫自定義客戶端。
+
+
+## Azure App Service 部署（快速開始）
+使用 Azure Developer CLI (azd) 將 MCP 伺服器部署為 Azure App Service 上的 Web 服務。提供具有自動擴展和監控功能的生產就緒 HTTP 端點。
+
+```bash
+# 安裝 Azure Developer CLI
+curl -fsSL https://aka.ms/install-azd.sh | bash
+
+# 使用 Azure 進行身份驗證
+azd auth login
+
+# 部署到 Azure（首次）
+azd up
+
+# 變更後重新部署
+azd deploy
+```
+
+📖 **[完整 Azure App Service 部署指南 →](./AZURE_APP_SERVICE.md)**
 
 ## 最新公告
 
